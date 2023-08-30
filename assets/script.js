@@ -81,29 +81,52 @@ var questionObjectList = [
     responses: ["relative", "static", "fixed", "absolute"],
     answer: "static",
   },
-  {
-    question: "What is the default value of the position property?",
-    responses: ["relative", "static", "fixed", "absolute"],
-    answer: "static",
-  },
-  {
-    question: "What is the default value of the position property?",
-    responses: ["relative", "static", "fixed", "absolute"],
-    answer: "static",
-  },
-  {
-    question: "What is the default value of the position property?",
-    responses: ["relative", "static", "fixed", "absolute"],
-    answer: "static",
-  },
-  {
-    question: "What is the default value of the position property?",
-    responses: ["relative", "static", "fixed", "absolute"],
-    answer: "static",
-  },
 ];
 
 // FUNCTIONS
+
+// This function will create a new space with the question
+function createQuestion(questionObject) {
+  var questionHeader = document.createElement("h2");
+  var questionList = document.createElement("ul");
+  var answerButton1 = document.createElement("input");
+  var answerLi1 = document.createElement("li");
+  answerButton1.setAttribute("type", "button");
+  var answerButton2 = document.createElement("input");
+  var answerLi2 = document.createElement("li");
+  answerButton2.setAttribute("type", "button");
+  var answerButton3 = document.createElement("input");
+  var answerLi3 = document.createElement("li");
+  answerButton3.setAttribute("type", "button");
+  var answerButton4 = document.createElement("input");
+  var answerLi4 = document.createElement("li");
+  answerButton4.setAttribute("type", "button");
+
+  questionHeader.textContent = questionObject.question;
+  answerButton1.setAttribute("value", questionObject.responses[0]);
+  answerButton1.setAttribute("class", "question-button");
+  answerButton2.setAttribute("value", questionObject.responses[1]);
+  answerButton2.setAttribute("class", "question-button");
+  answerButton3.setAttribute("value", questionObject.responses[2]);
+  answerButton3.setAttribute("class", "question-button");
+  answerButton4.setAttribute("value", questionObject.responses[3]);
+  answerButton4.setAttribute("class", "question-button");
+
+  answerLi1.appendChild(answerButton1);
+  answerLi2.appendChild(answerButton2);
+  answerLi3.appendChild(answerButton3);
+  answerLi4.appendChild(answerButton4);
+
+  questionList.setAttribute("class", "question-list");
+
+  questionList.appendChild(answerLi1);
+  questionList.appendChild(answerLi2);
+  questionList.appendChild(answerLi3);
+  questionList.appendChild(answerLi4);
+
+  mainEl.appendChild(questionHeader);
+  mainEl.appendChild(questionList);
+}
 
 // This will clear the main tag between start and each question
 function clearMainArea() {
@@ -129,9 +152,11 @@ startButtonEl.addEventListener("click", function () {
   // Clear the current page
   clearMainArea();
   startTimer();
+  createQuestion(questionObjectList[0]);
 });
+
 // INITAILZATIONS
-console.log(questionObjectList);
+
 // Steps
 // Event listener on starting button
 // Timer starts
