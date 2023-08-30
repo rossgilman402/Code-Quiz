@@ -1,12 +1,19 @@
 // DEPENDENCIES
 var mainEl = document.querySelector("#main-container");
 var startButtonEl = document.querySelector("#start-button");
+var highScoreEl = document.querySelector("#high-score-button");
 var timerTextEl = document.querySelector("#timer-text");
 
 // VARIABLES
 var timeLeft = 100;
+var endTime = 0;
 var currentQuestionIndex = 0;
 var isCorrect = false;
+var leaderBoard = [
+  { name: "RG", score: 34 },
+  { name: "BM", score: 78 },
+];
+var timerInterval;
 var questionObjectList = [
   {
     question: "Inside which HTML element do we put the JavaScript",
@@ -137,25 +144,26 @@ function createQuestion(questionObject) {
 
 // This will clear the main tag between start and each question
 function clearMainArea() {
-  console.log(mainEl);
   while (mainEl.firstElementChild) {
     mainEl.firstChild.remove();
   }
-  console.log(mainEl);
 }
 
 function startTimer() {
-  var timerInterval = setInterval(function () {
+  timerInterval = setInterval(function () {
     timerTextEl.textContent = "Time: " + timeLeft;
 
     if (timeLeft > 0) {
       timeLeft--;
+    } else {
+      endTime = 0;
+      clearInterval(timerInterval);
+      scoreBoard();
     }
   }, 1000);
 }
 
 function handleAnswer(event) {
-  console.log(event.target.value);
   if (event.target.value === questionObjectList[currentQuestionIndex].answer) {
     isCorrect = true;
   } else {
@@ -163,16 +171,107 @@ function handleAnswer(event) {
   }
 
   clearMainArea();
-  playTheGame();
-}
-
-// After the game is started we will continue to the next iteration of the questions
-function playTheGame() {
   if (currentQuestionIndex < questionObjectList.length - 1) {
     currentQuestionIndex += 1;
     createQuestion(questionObjectList[currentQuestionIndex]);
+    printAnswerResult();
   } else {
-    console.log("END OF GAME");
+    clearInterval(timerInterval);
+    endTime = timeLeft;
+    console.log(endTime);
+    scoreBoard();
+  }
+}
+
+// this method will print on the next iteration page if the answer was correct or incorrect
+function printAnswerResult() {
+  var resultH2 = document.createElement("h2");
+  resultH2.setAttribute("class", "result-header");
+
+  if (isCorrect) {
+    resultH2.textContent = "Correct!";
+    resultH2.setAttribute("class", "result-header-correct");
+  } else {
+    resultH2.textContent = "Incorrect!";
+    resultH2.setAttribute("class", "result-header-incorrect");
+    timeLeft = timeLeft - 10;
+  }
+  mainEl.prepend(resultH2);
+}
+
+// This will be the page to add to score board at the end of the quiz
+function scoreBoard() {
+  var scoreHeader = document.createElement("h2");
+  scoreHeader.textContent = "All Done!";
+  var scoreP = document.createElement("p");
+  scoreP.textContent = "You final score is " + endTime + ".";
+  var scoreForm = document.createElement("form");
+  var scoreInput = document.createElement("input");
+  scoreInput.setAttribute("input", "text");
+  var initialsP = document.createElement("p");
+  initialsP.textContent = "Enter Initials: ";
+  var scoreButton = document.createElement("button");
+  scoreButton.setAttribute("class", "submit-button");
+  scoreButton.textContent = "Submit";
+
+  scoreForm.appendChild(scoreInput);
+  scoreForm.appendChild(scoreButton);
+
+  mainEl.appendChild(scoreHeader);
+  mainEl.appendChild(scoreP);
+  mainEl.appendChild(initialsP);
+  mainEl.appendChild(scoreForm);
+
+  scoreButton.addEventListener("click", handleSubmit);
+}
+
+// This will handle the submission form and adding to the leaderboard
+function handleSubmit(event) {
+  console.log(event.target);
+  printLeaderBoard();
+}
+
+//This will be the page to print the leaderboard
+function printLeaderBoard(event) {
+  clearMainArea();
+  var headerArea = document.querySelector("#header-container");
+  while (headerArea.firstElementChild) {
+    headerArea.firstChild.remove();
+  }
+
+  var scoresHeader = document.createElement("h1");
+  scoresHeader.textContent = "High Scores";
+  var scoresList = document.createElement("ol");
+
+  for (var i = 0; i < leaderBoard.length; i++) {
+    var scoreLi = document.createElement("li");
+    var scoreP = document.createElement("p");
+    scoreP.textContent = leaderBoard[i].name + " - " + leaderBoard[i].score;
+    scoreLi.appendChild(scoreP);
+    scoresList.appendChild(scoreLi);
+  }
+
+  var goBackButton = document.createElement("button");
+  goBackButton.setAttribute("class", "submit-button");
+  goBackButton.textContent = "Go Back";
+
+  var clearScore = document.createElement("button");
+  clearScore.setAttribute("class", "submit-button");
+  clearScore.textContent = "Clear High Scores";
+
+  mainEl.appendChild(scoresHeader);
+  mainEl.appendChild(scoresList);
+  mainEl.appendChild(goBackButton);
+  mainEl.appendChild(clearScore);
+
+  clearScore.addEventListener("click", emptyLeaderBoard);
+}
+
+function emptyLeaderBoard() {
+  leaderBoard.splice(0, leaderBoard.length);
+  var olEl = document.querySelector("ol");
+  while (olEl.firstElementChild) {
+    olEl.firstChild.remove();
   }
 }
 
@@ -182,6 +281,10 @@ startButtonEl.addEventListener("click", function () {
   clearMainArea();
   startTimer();
   createQuestion(questionObjectList[currentQuestionIndex]);
+});
+
+highScoreEl.addEventListener("click", function () {
+  printLeaderBoard();
 });
 
 // INITAILZATIONS
