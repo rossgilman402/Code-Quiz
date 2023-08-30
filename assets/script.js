@@ -5,6 +5,8 @@ var timerTextEl = document.querySelector("#timer-text");
 
 // VARIABLES
 var timeLeft = 100;
+var currentQuestionIndex = 0;
+var isCorrect = false;
 var questionObjectList = [
   {
     question: "Inside which HTML element do we put the JavaScript",
@@ -126,6 +128,11 @@ function createQuestion(questionObject) {
 
   mainEl.appendChild(questionHeader);
   mainEl.appendChild(questionList);
+
+  answerButton1.addEventListener("click", handleAnswer);
+  answerButton2.addEventListener("click", handleAnswer);
+  answerButton3.addEventListener("click", handleAnswer);
+  answerButton4.addEventListener("click", handleAnswer);
 }
 
 // This will clear the main tag between start and each question
@@ -147,12 +154,34 @@ function startTimer() {
   }, 1000);
 }
 
+function handleAnswer(event) {
+  console.log(event.target.value);
+  if (event.target.value === questionObjectList[currentQuestionIndex].answer) {
+    isCorrect = true;
+  } else {
+    isCorrect = false;
+  }
+
+  clearMainArea();
+  playTheGame();
+}
+
+// After the game is started we will continue to the next iteration of the questions
+function playTheGame() {
+  if (currentQuestionIndex < questionObjectList.length - 1) {
+    currentQuestionIndex += 1;
+    createQuestion(questionObjectList[currentQuestionIndex]);
+  } else {
+    console.log("END OF GAME");
+  }
+}
+
 // start-button event to start the game
 startButtonEl.addEventListener("click", function () {
   // Clear the current page
   clearMainArea();
   startTimer();
-  createQuestion(questionObjectList[0]);
+  createQuestion(questionObjectList[currentQuestionIndex]);
 });
 
 // INITAILZATIONS
