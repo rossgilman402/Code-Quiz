@@ -245,7 +245,9 @@ function printLeaderBoard(event) {
 
   for (var i = 0; i < leaderBoard.length; i++) {
     var scoreLi = document.createElement("li");
+    scoreLi.setAttribute("id", "li-style");
     var scoreP = document.createElement("p");
+    scoreP.setAttribute("id", "score-style");
     scoreP.textContent = leaderBoard[i].name + " - " + leaderBoard[i].score;
     scoreLi.appendChild(scoreP);
     scoresList.appendChild(scoreLi);
@@ -265,8 +267,50 @@ function printLeaderBoard(event) {
   mainEl.appendChild(clearScore);
 
   clearScore.addEventListener("click", emptyLeaderBoard);
+  goBackButton.addEventListener("click", goBack);
 }
 
+// Function to return to the home screen from the leadboard page
+function goBack() {
+  clearMainArea();
+  var bodyEl = document.querySelector("body");
+
+  var headerEl = document.createElement("header");
+  headerEl.setAttribute("id", "header-container");
+  var headerButton = document.createElement("button");
+  headerButton.setAttribute("id", "high-score-button");
+  headerButton.textContent = "View High Scores";
+  var headerP = document.createElement("p");
+  headerP.textContent = "Time: 0";
+
+  headerEl.appendChild(headerButton);
+  headerEl.appendChild(headerP);
+
+  bodyEl.appendChild(headerEl);
+
+  var mainEl = document.createElement("main");
+  mainEl.setAttribute("id", "main-container");
+  var mainH1 = document.createElement("h1");
+  mainH1.textContent = "Coding Quiz Challenge";
+  var mainP = document.createElement("p");
+  mainP.textContent =
+    "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your score/time by ten seconds!";
+  var mainInput = document.createElement("input");
+  mainInput.setAttribute("id", "start-button");
+  mainInput.setAttribute("type", "button");
+  mainInput.setAttribute("value", "Start Quiz");
+
+  mainEl.appendChild(mainH1);
+  mainEl.appendChild(mainP);
+  mainEl.appendChild(mainInput);
+
+  bodyEl.appendChild(mainEl);
+
+  mainInput.addEventListener("click", playGame);
+  headerButton.addEventListener("click", printLeaderBoard);
+}
+
+// Loop through the leaderboard and remove if there are elements left and empty the leaderboard array
 function emptyLeaderBoard() {
   leaderBoard.splice(0, leaderBoard.length);
   var olEl = document.querySelector("ol");
@@ -275,17 +319,18 @@ function emptyLeaderBoard() {
   }
 }
 
-// start-button event to start the game
-startButtonEl.addEventListener("click", function () {
+// Play the game
+function playGame() {
   // Clear the current page
   clearMainArea();
   startTimer();
   createQuestion(questionObjectList[currentQuestionIndex]);
-});
+}
 
-highScoreEl.addEventListener("click", function () {
-  printLeaderBoard();
-});
+// start-button event to start the game
+startButtonEl.addEventListener("click", playGame);
+
+highScoreEl.addEventListener("click", printLeaderBoard);
 
 // INITAILZATIONS
 

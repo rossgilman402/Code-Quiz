@@ -76,3 +76,17 @@ main p {
   background-color: purple;
   color: white;
 }
+
+#li-style {
+  margin: 20px;
+  text-align: center;
+}
+
+#score-style {
+  margin: 10px 0;
+  border: 1px solid purple;
+  border-radius: 2px;
+  padding: 0;
+  width: 40%;
+  text-align: center;
+}
