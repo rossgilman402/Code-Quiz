@@ -9,10 +9,7 @@ var timeLeft = 100;
 var endTime = 0;
 var currentQuestionIndex = 0;
 var isCorrect = false;
-var leaderBoard = [
-  { name: "RG", score: 34 },
-  { name: "BM", score: 78 },
-];
+var leaderBoard = JSON.parse(localStorage.getItem("all-scores")) || [];
 var timerInterval;
 var questionObjectList = [
   {
@@ -144,6 +141,7 @@ function createQuestion(questionObject) {
 
 // This will clear the main tag between start and each question
 function clearMainArea() {
+  mainEl = document.querySelector("#main-container");
   while (mainEl.firstElementChild) {
     mainEl.firstChild.remove();
   }
@@ -158,6 +156,7 @@ function startTimer() {
     } else {
       endTime = 0;
       clearInterval(timerInterval);
+      clearMainArea();
       scoreBoard();
     }
   }, 1000);
@@ -178,7 +177,6 @@ function handleAnswer(event) {
   } else {
     clearInterval(timerInterval);
     endTime = timeLeft;
-    console.log(endTime);
     scoreBoard();
   }
 }
@@ -199,19 +197,29 @@ function printAnswerResult() {
   mainEl.prepend(resultH2);
 }
 
+// This will handle the submission form and adding to the leaderboard
+function handleSubmit(scoreValue) {
+  var currentPerson = {
+    name: scoreValue,
+    score: timeLeft,
+  };
+  leaderBoard.push(currentPerson);
+  localStorage.setItem("all-scores", JSON.stringify(leaderBoard));
+}
+
 // This will be the page to add to score board at the end of the quiz
 function scoreBoard() {
   var scoreHeader = document.createElement("h2");
   scoreHeader.textContent = "All Done!";
   var scoreP = document.createElement("p");
-  scoreP.textContent = "You final score is " + endTime + ".";
+  scoreP.textContent = "You final score is " + (endTime + 1) + ".";
   var scoreForm = document.createElement("form");
   var scoreInput = document.createElement("input");
   scoreInput.setAttribute("input", "text");
   var initialsP = document.createElement("p");
   initialsP.textContent = "Enter Initials: ";
   var scoreButton = document.createElement("button");
-  scoreButton.setAttribute("class", "submit-button");
+  scoreButton.setAttribute("id", "submit-button");
   scoreButton.textContent = "Submit";
 
   scoreForm.appendChild(scoreInput);
@@ -222,101 +230,11 @@ function scoreBoard() {
   mainEl.appendChild(initialsP);
   mainEl.appendChild(scoreForm);
 
-  scoreButton.addEventListener("click", handleSubmit);
-}
-
-// This will handle the submission form and adding to the leaderboard
-function handleSubmit(event) {
-  console.log(event.target);
-  printLeaderBoard();
-}
-
-//This will be the page to print the leaderboard
-function printLeaderBoard(event) {
-  clearMainArea();
-  var headerArea = document.querySelector("#header-container");
-  while (headerArea.firstElementChild) {
-    headerArea.firstChild.remove();
-  }
-
-  var scoresHeader = document.createElement("h1");
-  scoresHeader.textContent = "High Scores";
-  var scoresList = document.createElement("ol");
-
-  for (var i = 0; i < leaderBoard.length; i++) {
-    var scoreLi = document.createElement("li");
-    scoreLi.setAttribute("id", "li-style");
-    var scoreP = document.createElement("p");
-    scoreP.setAttribute("id", "score-style");
-    scoreP.textContent = leaderBoard[i].name + " - " + leaderBoard[i].score;
-    scoreLi.appendChild(scoreP);
-    scoresList.appendChild(scoreLi);
-  }
-
-  var goBackButton = document.createElement("button");
-  goBackButton.setAttribute("class", "submit-button");
-  goBackButton.textContent = "Go Back";
-
-  var clearScore = document.createElement("button");
-  clearScore.setAttribute("class", "submit-button");
-  clearScore.textContent = "Clear High Scores";
-
-  mainEl.appendChild(scoresHeader);
-  mainEl.appendChild(scoresList);
-  mainEl.appendChild(goBackButton);
-  mainEl.appendChild(clearScore);
-
-  clearScore.addEventListener("click", emptyLeaderBoard);
-  goBackButton.addEventListener("click", goBack);
-}
-
-// Function to return to the home screen from the leadboard page
-function goBack() {
-  clearMainArea();
-  var bodyEl = document.querySelector("body");
-
-  var headerEl = document.createElement("header");
-  headerEl.setAttribute("id", "header-container");
-  var headerButton = document.createElement("button");
-  headerButton.setAttribute("id", "high-score-button");
-  headerButton.textContent = "View High Scores";
-  var headerP = document.createElement("p");
-  headerP.textContent = "Time: 0";
-
-  headerEl.appendChild(headerButton);
-  headerEl.appendChild(headerP);
-
-  bodyEl.appendChild(headerEl);
-
-  var mainEl = document.createElement("main");
-  mainEl.setAttribute("id", "main-container");
-  var mainH1 = document.createElement("h1");
-  mainH1.textContent = "Coding Quiz Challenge";
-  var mainP = document.createElement("p");
-  mainP.textContent =
-    "Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your score/time by ten seconds!";
-  var mainInput = document.createElement("input");
-  mainInput.setAttribute("id", "start-button");
-  mainInput.setAttribute("type", "button");
-  mainInput.setAttribute("value", "Start Quiz");
-
-  mainEl.appendChild(mainH1);
-  mainEl.appendChild(mainP);
-  mainEl.appendChild(mainInput);
-
-  bodyEl.appendChild(mainEl);
-
-  mainInput.addEventListener("click", playGame);
-  headerButton.addEventListener("click", printLeaderBoard);
-}
-
-// Loop through the leaderboard and remove if there are elements left and empty the leaderboard array
-function emptyLeaderBoard() {
-  leaderBoard.splice(0, leaderBoard.length);
-  var olEl = document.querySelector("ol");
-  while (olEl.firstElementChild) {
-    olEl.firstChild.remove();
-  }
+  scoreButton.addEventListener("click", function () {
+    clearMainArea();
+    handleSubmit(scoreInput.value);
+    printLeaderBoard();
+  });
 }
 
 // Play the game
@@ -330,6 +248,10 @@ function playGame() {
 // start-button event to start the game
 startButtonEl.addEventListener("click", playGame);
 
+//Click high score button to go to score board page
+function printLeaderBoard() {
+  document.location.href = "./leaderboard.html";
+}
 highScoreEl.addEventListener("click", printLeaderBoard);
 
 // INITAILZATIONS
